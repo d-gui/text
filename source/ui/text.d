@@ -11,7 +11,7 @@ import ui.vertex        : Vertex5;
 import ui.glerrors      : checkGlError;
 
 
-//nothrow @nogc
+nothrow @nogc
 void drawText( 
     string text,   // text to draw
     int    x,      // positions in window

@@ -171,237 +171,237 @@ struct CacheGlyphSet
 }
 
 
-struct CacheGlyphSetStorage
-{
-    CacheGlyphSet ;
-}
+//struct CacheGlyphSetStorage
+//{
+//    CacheGlyphSet ;
+//}
 
 
-/** */
-struct GlyphCache
-{
-    CacheGlyphSetStorage storage;
+///** */
+//struct GlyphCache
+//{
+//    CacheGlyphSetStorage storage;
 
-    Glyph* create( string fontName, uint fontSize, uint glyphIndex )
-    {
-        return null;
-    }
+//    Glyph* create( string fontName, uint fontSize, uint glyphIndex )
+//    {
+//        return null;
+//    }
 
-    Glyph* read( string fontName, uint fontSize, uint glyphIndex )
-    {
-        return null;
-    }
+//    Glyph* read( string fontName, uint fontSize, uint glyphIndex )
+//    {
+//        return null;
+//    }
 
-    void update( string fontName, uint fontSize, uint glyphIndex )
-    {
-        //
-    }
+//    void update( string fontName, uint fontSize, uint glyphIndex )
+//    {
+//        //
+//    }
 
-    Glyph* readCreate( string fontName, uint fontSize, uint glyphIndex )
-    {
-        auto ret = read( fontName, fontSize, glyphIndex );
+//    Glyph* readCreate( string fontName, uint fontSize, uint glyphIndex )
+//    {
+//        auto ret = read( fontName, fontSize, glyphIndex );
 
-        if ( ret is null )
-        {
-            ret = create( fontName, fontSize, glyphIndex );
-        }
+//        if ( ret is null )
+//        {
+//            ret = create( fontName, fontSize, glyphIndex );
+//        }
 
-        return ret;
-    }
-}
-
-
-struct CRUDCache( T )
-{
-    T* create( ARGS... )( ARGS args )
-    {
-        return null;
-    }
-
-    T* read( ARGS... )( ARGS args )
-    {
-        return null;
-    }
-
-    void update( ARGS... )( ARGS args )
-    {
-        //
-    }
-
-    void delete()
-    {
-        //
-    }
-
-    T* readCreate( ARGS... )( ARGS args )
-    {
-        return null;
-    }
-}
+//        return ret;
+//    }
+//}
 
 
-//
-struct GlyphCache
-{
-    size_t glyphsCount;
-    Glyph  glyph;
-    void*  pixmap;
-}
+//struct CRUDCache( T )
+//{
+//    T* create( ARGS... )( ARGS args )
+//    {
+//        return null;
+//    }
+
+//    T* read( ARGS... )( ARGS args )
+//    {
+//        return null;
+//    }
+
+//    void update( ARGS... )( ARGS args )
+//    {
+//        //
+//    }
+
+//    void delete()
+//    {
+//        //
+//    }
+
+//    T* readCreate( ARGS... )( ARGS args )
+//    {
+//        return null;
+//    }
+//}
 
 
-struct FreeTypeCache
-{
-    FTC_Manager    manager;
-    FTC_CMapCache  cmapCache;
-    FTC_ImageCache imageCache;
-
-    this( string name )
-    {
-        auto err = 
-            FTC_Manager_New( 
-                ft,
-                128,
-                0,
-                0,
-                requester,
-                null,
-                &manager
-            );
-
-        err = FTC_CMapCache_New( manager, &cmapCache );
-        err = FTC_ImageCache_New( manager, &imageCache );
-    }
-
-    ~this()
-    {
-        FTC_Manager_Done( manager );
-    }
-
-    FT_Glyph lookup( FTC_FaceID face_id, height, glyphIndex )
-    {
-        //
-        FTC_ScalerRec scaler;
-        scaler.face_id = face_id;
-        scaler.height  = height;
-        scaler.pixel   = 1;
-
-        auto size = lookupSize( &scaler );
-
-        //
-        FTC_ImageTypeRec imageType;
-        imageType.face_id = face_id;
-        imageType.height  = height;
-        imageType.flags   = FT_LOAD_DEFAULT; // FT_LOAD_DEFAULT | FT_LOAD_NO_SCALE | FT_LOAD_*
-        auto glyph = lookupImage( &imageType, glyphIndex );
-
-        return glyph;
-    }
-
-    FT_Face lookupFace( FTC_FaceID face_id )
-    {
-        FT_Face face;
-
-        auto err = 
-            FTC_Manager_LookupFace( 
-                manager,
-                face_id,
-                &face
-            );
-
-        if ( !err )
-        {
-            return face;
-        }
-        else
-        {
-            handleError( err );
-            return null;
-        }
-    }
-
-    FT_Size lookupSize( FTC_Scaler scaler )
-    {
-        FT_Size size;
-
-        auto err = 
-            FTC_Manager_LookupSize( 
-                manager,
-                scaler,
-                &size
-            );
-
-        if ( !err )
-        {
-            return face;
-        }
-        else
-        {
-            handleError( err );
-            return null;
-        }
-    }
-
-    FT_Glyph lookupGlyphIndex( FTC_FaceID face_id, FT_Int cmap_index, FT_UInt32 char_code )
-    {
-        auto glyphIndex = 
-            FTC_CMapCache_Lookup( 
-                cmapCache, 
-                cmap_index, 
-                char_code 
-            );
-
-        return glyphIndex;
-    }
-
-    FT_Glyph lookupImage( FTC_ImageType type, FT_UInt glyphIndex )
-    {
-        FT_Glyph glyph;
-        FTC_Node node;
-
-        auto err = 
-            FTC_ImageCache_Lookup( 
-                imageCache,
-                type,
-                glyphIndex,
-                &glyph,
-                &node
-            );
-
-        if ( !err )
-        {
-            return glyph;
-        }
-        else
-        {
-            handleError( err );
-            return null;
-        }
-    }
+////
+//struct GlyphCache
+//{
+//    size_t glyphsCount;
+//    Glyph  glyph;
+//    void*  pixmap;
+//}
 
 
-    static
-    void handleError( FT_Error err )
-    {
-        const char* errString = FT_Error_String( err );
-        printf( "error: FreeType: [%d]: %s\n", err, errString );
-    }
+//struct FreeTypeCache
+//{
+//    FTC_Manager    manager;
+//    FTC_CMapCache  cmapCache;
+//    FTC_ImageCache imageCache;
 
-    static
-    FT_Error requester( 
-        FTC_FaceID face_id,
-        FT_Library library,
-        FT_Pointer req_data,
-        FT_Face*   face
-    )
-    {
-        auto err = 
-            FT_New_Face( 
-               library,
-               req_data.fileName,
-               req_data.faceIndex,
-               face );
+//    this( string name )
+//    {
+//        auto err = 
+//            FTC_Manager_New( 
+//                ft,
+//                128,
+//                0,
+//                0,
+//                requester,
+//                null,
+//                &manager
+//            );
 
-        return err;
-    }
-}
+//        err = FTC_CMapCache_New( manager, &cmapCache );
+//        err = FTC_ImageCache_New( manager, &imageCache );
+//    }
+
+//    ~this()
+//    {
+//        FTC_Manager_Done( manager );
+//    }
+
+//    FT_Glyph lookup( FTC_FaceID face_id, height, glyphIndex )
+//    {
+//        //
+//        FTC_ScalerRec scaler;
+//        scaler.face_id = face_id;
+//        scaler.height  = height;
+//        scaler.pixel   = 1;
+
+//        auto size = lookupSize( &scaler );
+
+//        //
+//        FTC_ImageTypeRec imageType;
+//        imageType.face_id = face_id;
+//        imageType.height  = height;
+//        imageType.flags   = FT_LOAD_DEFAULT; // FT_LOAD_DEFAULT | FT_LOAD_NO_SCALE | FT_LOAD_*
+//        auto glyph = lookupImage( &imageType, glyphIndex );
+
+//        return glyph;
+//    }
+
+//    FT_Face lookupFace( FTC_FaceID face_id )
+//    {
+//        FT_Face face;
+
+//        auto err = 
+//            FTC_Manager_LookupFace( 
+//                manager,
+//                face_id,
+//                &face
+//            );
+
+//        if ( !err )
+//        {
+//            return face;
+//        }
+//        else
+//        {
+//            handleError( err );
+//            return null;
+//        }
+//    }
+
+//    FT_Size lookupSize( FTC_Scaler scaler )
+//    {
+//        FT_Size size;
+
+//        auto err = 
+//            FTC_Manager_LookupSize( 
+//                manager,
+//                scaler,
+//                &size
+//            );
+
+//        if ( !err )
+//        {
+//            return face;
+//        }
+//        else
+//        {
+//            handleError( err );
+//            return null;
+//        }
+//    }
+
+//    FT_Glyph lookupGlyphIndex( FTC_FaceID face_id, FT_Int cmap_index, FT_UInt32 char_code )
+//    {
+//        auto glyphIndex = 
+//            FTC_CMapCache_Lookup( 
+//                cmapCache, 
+//                cmap_index, 
+//                char_code 
+//            );
+
+//        return glyphIndex;
+//    }
+
+//    FT_Glyph lookupImage( FTC_ImageType type, FT_UInt glyphIndex )
+//    {
+//        FT_Glyph glyph;
+//        FTC_Node node;
+
+//        auto err = 
+//            FTC_ImageCache_Lookup( 
+//                imageCache,
+//                type,
+//                glyphIndex,
+//                &glyph,
+//                &node
+//            );
+
+//        if ( !err )
+//        {
+//            return glyph;
+//        }
+//        else
+//        {
+//            handleError( err );
+//            return null;
+//        }
+//    }
+
+
+//    static
+//    void handleError( FT_Error err )
+//    {
+//        const char* errString = FT_Error_String( err );
+//        printf( "error: FreeType: [%d]: %s\n", err, errString );
+//    }
+
+//    static
+//    FT_Error requester( 
+//        FTC_FaceID face_id,
+//        FT_Library library,
+//        FT_Pointer req_data,
+//        FT_Face*   face
+//    )
+//    {
+//        auto err = 
+//            FT_New_Face( 
+//               library,
+//               req_data.fileName,
+//               req_data.faceIndex,
+//               face );
+
+//        return err;
+//    }
+//}
 
